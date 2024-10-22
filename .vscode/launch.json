@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "${workspaceFolderBasename}",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/.build/${workspaceFolderBasename}.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "preLaunchTask": "build"
+    }
+  ]
+}
