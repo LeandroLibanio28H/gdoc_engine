@@ -59,12 +59,12 @@ main :: proc() {
 		}
 	}
 
-    world := GDOCTestWorld {}
-    defer ecs.world_destroy(&world)
-    ecs.world_init(&world, MAX_ENTITIES)
+    world := new(GDOCTestWorld)
+    defer destroy_world(world)
+    ecs.world_init(world, MAX_ENTITIES)
 
 	for i in 0..<100 {
-		entity := ecs.create_entity(&world)
+		entity := ecs.create_entity(world)
 		position := PositionComponent {
             x = f32(rand.int31() % 1280),
 			y = f32(rand.int31() % 720)
@@ -87,17 +87,23 @@ main :: proc() {
 	raylib.SetTargetFPS(raylib.GetMonitorRefreshRate(raylib.GetCurrentMonitor()))
 
 	for !raylib.WindowShouldClose() {
-		movement_system(&world)
+		movement_system(world)
 
 		raylib.BeginDrawing()
 		raylib.ClearBackground(raylib.BLACK)
 
-		draw_system(&world)
+		draw_system(world)
 
 		raylib.DrawFPS(0, 0)
 
 		raylib.EndDrawing()
 	}
+}
+
+
+destroy_world :: proc(world : ^GDOCTestWorld) {
+	ecs.world_destroy(world)
+	free(world)
 }
 
 
