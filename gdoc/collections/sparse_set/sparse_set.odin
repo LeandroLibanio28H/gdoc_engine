@@ -12,8 +12,8 @@ SparseSetElement :: struct {
 SparseSet :: struct($T : typeid, $N : uint)
 where
 intrinsics.type_is_subtype_of(T, SparseSetElement) {
-    dense : [dynamic]T,
-    sparse : [dynamic]uint,
+    dense : [N]T,
+    sparse : [N]uint,
     count : uint
 }
 
