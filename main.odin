@@ -22,7 +22,10 @@ VelocityComponent :: struct {
     using base : ecs.ComponentBase
 }
 
-DrawableComponent :: struct {using base : ecs.ComponentBase}
+DrawableComponent :: struct {
+	radius : f32,
+	using base : ecs.ComponentBase
+}
 
 CollisionComponent :: struct {using base : ecs.ComponentBase}
 
@@ -73,7 +76,9 @@ main :: proc() {
             x = rand.float32() * (10 if rand.int31() % 2 == 0 else -10),
 			y = rand.float32() * (10 if rand.int31() % 2 == 0 else -10)
 		}
-		drawable := DrawableComponent {}
+		drawable := DrawableComponent {
+			radius = rand.float32() * 7 + 5
+		}
 		collision := CollisionComponent {}
         
         
@@ -131,6 +136,6 @@ draw_system :: proc(world : ^GDOCTestWorld) {
 		position := ecs.get_component(i, &world.position_components) or_continue query
 		drawable := ecs.get_component(i, &world.drawable_components) or_continue query
 		
-		raylib.DrawCircle(i32(position.x), i32(position.y), 10.0, raylib.WHITE)
+		raylib.DrawCircle(i32(position.x), i32(position.y), drawable.radius, raylib.WHITE)
 	}
 }
