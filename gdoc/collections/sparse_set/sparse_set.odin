@@ -24,7 +24,7 @@ where
 intrinsics.type_is_subtype_of(T, SparseSetElement),
 type_of(N) == uint {
     if idx >= len(sset.sparse) do return false
-    return sset.sparse[idx] >= 0 && sset.sparse[idx] < sset.count && sset.dense[sset.sparse[idx]]._id == idx;
+    return sset.sparse[idx] >= 0 && sset.sparse[idx] < sset.count && sset.dense[sset.sparse[idx]]._id == idx
 }
 
 /// Returns (item, true) where (item._id == idx) if exists, otherwise, returns ({}, false)
