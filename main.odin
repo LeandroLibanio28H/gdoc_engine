@@ -6,6 +6,7 @@ import "core:mem"
 import "core:math/rand"
 
 import "gdoc/ecs"
+import "gdoc/collections/quadtree"
 
 
 MAX_ENTITIES : ecs.EntityId : 5000
@@ -61,12 +62,13 @@ main :: proc() {
 			mem.tracking_allocator_destroy(&track)
 		}
 	}
-
+	qtree := quadtree.qtree_new(5, 5, quadtree.Rect{0, 0, 1280, 720}, MAX_ENTITIES)
+	defer quadtree.qtree_destroy(qtree)
     world := new(GDOCTestWorld)
     defer destroy_world(world)
     ecs.world_init(world, MAX_ENTITIES)
 
-	for i in 0..<100 {
+	for i in 0..<20 {
 		entity := ecs.create_entity(world)
 		position := PositionComponent {
             x = f32(rand.int31() % 1280),
@@ -93,11 +95,13 @@ main :: proc() {
 
 	for !raylib.WindowShouldClose() {
 		movement_system(world)
+		qtree_system(world, qtree)
 
 		raylib.BeginDrawing()
 		raylib.ClearBackground(raylib.BLACK)
 
 		draw_system(world)
+		draw_qnode(qtree.root)
 
 		raylib.DrawFPS(0, 0)
 
@@ -137,5 +141,34 @@ draw_system :: proc(world : ^GDOCTestWorld) {
 		drawable := ecs.get_component(i, &world.drawable_components) or_continue query
 		
 		raylib.DrawCircle(i32(position.x), i32(position.y), drawable.radius, raylib.WHITE)
+	}
+}
+
+
+qtree_system :: proc(world : ^GDOCTestWorld, qtree : ^quadtree.QuadTree($N)) 
+where
+type_of(N) == uint {
+	quadtree.qtree_root_clear(qtree)
+
+	entities := ecs.get_entities_with_component(&world.position_components)
+	defer delete(entities)
+
+	query : for i in entities {
+		position := ecs.get_component(i, &world.position_components) or_continue query
+		
+		quadtree.qtree_insert(qtree, i, i32(position.x), i32(position.y))
+	}
+}
+
+
+draw_qnode :: proc(qnode : ^quadtree.QuadTreeNode) {
+	if qnode.split {
+		for q in qnode.quadrants {
+			draw_qnode(q)
+		}
+	}
+
+	if len(qnode.entities) > 0{
+		raylib.DrawRectangleLines(qnode.rect.x, qnode.rect.y, qnode.rect.width, qnode.rect.height, raylib.GREEN)
 	}
 }
